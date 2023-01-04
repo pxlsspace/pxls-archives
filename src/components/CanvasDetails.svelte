@@ -29,7 +29,7 @@
     /**
      * Whether the details is open (expanded).
      */
-    let isOpen = true;
+    let isOpen = active;
 
     
     /** @type {Element} The details element */
