@@ -1,6 +1,6 @@
 {
 	"name": "pxls-archives",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^1.0.0",
 		"@sveltejs/adapter-static": "^1.0.0",
+		"moment": "^2.29.4",
 		"showdown": "^2.1.0",
 		"yaml": "^2.2.1"
 	}

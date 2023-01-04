@@ -1,6 +1,8 @@
 <script>
     import { onMount } from 'svelte';
 
+    import moment from 'moment';
+
     /**
      * The canvas code.
      * @type {string}
@@ -12,6 +14,13 @@
      * @type {object}
      */
     export let meta;
+
+    const startDate = new Date(meta.start);
+    const startDateStr = startDate.toLocaleDateString(undefined, { dateStyle: 'full' });
+    const endDate = new Date(meta.end);
+    const endDateStr = endDate.toLocaleDateString(undefined, { dateStyle: 'full' });
+    const duration = moment(endDate).diff(moment(startDate), 'days');
+
     /**
      * Whether the canvas is active. Disables the final canvas image if true.
      */
@@ -75,8 +84,13 @@
             </div>
         {/if}
         {#if meta}
-            <p><strong>{meta.start}</strong> - <strong>{meta.end}</strong></p>
+            {#if meta.end}
+                <p>Canvas {canvas} started on <strong>{startDateStr}</strong> and ended on <strong>{endDateStr}</strong>. It lasted <strong>{duration} days</strong>.</p>
+            {:else}
+                <p>Canvas {canvas} started on <strong>{startDateStr}</strong>.</p>
+            {/if}
             {#if meta.description}
+                <br>
                 <p>{@html meta.description}</p>
             {/if}
         {/if}
