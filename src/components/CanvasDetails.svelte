@@ -7,6 +7,12 @@
      */
     export let canvas;
     /**
+     * Metadata about the canvas.
+     * See static/data/meta.yml for more.
+     * @type {object}
+     */
+    export let meta;
+    /**
      * Whether the canvas is active. Disables the final canvas image if true.
      */
     export let active = false;
@@ -14,7 +20,7 @@
     /**
      * Whether the details is open (expanded).
      */
-    let isOpen = active;
+    let isOpen = true;
 
     
     /** @type {Element} The details element */
@@ -59,6 +65,7 @@
             <div class="image-wrapper">
                 <img
                     bind:this={finalImgEl}
+                    src={isOpen ? `data/images/canvas-${canvas}-final.png` : null}
                     data-src="data/images/canvas-{canvas}-final.png"
                     width="256px"
                     onclick="window.open(this.src, '_blank');"
@@ -66,6 +73,12 @@
                 />
                 <span>Final canvas</span>
             </div>
+        {/if}
+        {#if meta}
+            <p><strong>{meta.start}</strong> - <strong>{meta.end}</strong></p>
+            {#if meta.description}
+                <p>{@html meta.description}</p>
+            {/if}
         {/if}
     </div>
 </details>
