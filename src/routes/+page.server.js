@@ -3,3 +3,5 @@ export async function load() {
         version: process.env.npm_package_version
     };
 }
+
+export const prerender = true;
