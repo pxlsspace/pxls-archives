@@ -1,97 +1,172 @@
 <script>
-    import { onMount } from 'svelte';
-
     import moment from 'moment';
+    import ImageWrapper from './ImageWrapper.svelte';
+    import MediaWrapper from './MediaWrapper.svelte';
+    import VideoWrapper from './VideoWrapper.svelte';
 
-    /**
-     * The canvas code.
-     * @type {string}
-     */
-    export let canvas;
     /**
      * Metadata about the canvas.
      * See static/data/meta.yml for more.
      * @type {object}
      */
-    export let meta;
+    export let canvas;
 
-    const startDate = new Date(meta.start);
+    const startDate = new Date(canvas.start);
     const startDateStr = startDate.toLocaleDateString(undefined, { dateStyle: 'full' });
-    const endDate = new Date(meta.end);
+    const endDate = new Date(canvas.end);
     const endDateStr = endDate.toLocaleDateString(undefined, { dateStyle: 'full' });
     const duration = moment(endDate).diff(moment(startDate), 'days');
 
     /**
-     * Whether the canvas is active. Disables the final canvas image if true.
-     */
-    export let active = false;
-
-    /**
      * Whether the details is open (expanded).
      */
-    let isOpen = active;
+    let isOpen = canvas.active// || canvas.code === '63';
 
-    
-    /** @type {Element} The details element */
-    let detailsEl;
-    /** @type {Element} The initial image element */
-    let initialImgEl;
-    /** @type {Element} The final image element */
-    let finalImgEl;
-
-    onMount(() => {
-        const observer = new MutationObserver(([{ target }]) => {
-            // Only update image source attributes if opening details
-            if (!target.open) return;
-            if (!initialImgEl.getAttribute('src')) {
-                initialImgEl.setAttribute('src', initialImgEl.getAttribute('data-src'));
-            }
-            if (finalImgEl && !finalImgEl.getAttribute('src')) {
-                finalImgEl.setAttribute('src', finalImgEl.getAttribute('data-src'));
-            }
-        });
-
-        observer.observe(detailsEl, { attributes: true, attributeFilter: ['open'] });
-    });
+    let loadedImages = new Map();
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<details open={isOpen} bind:this={detailsEl}>
-    <summary class="card card-button">Canvas {canvas}{#if active}&nbsp;(Active){/if}</summary>
+<details bind:open={isOpen}>
+    <summary class="card card-button">Canvas {canvas.code}{#if canvas.active}&nbsp;(Active){/if}</summary>
     <div class="canvas-body">
-        <div class="image-wrapper">
-            <img
-                bind:this={initialImgEl}
-                src={isOpen ? `data/images/canvas-${canvas}-initial.png` : null}
-                data-src="data/images/canvas-{canvas}-initial.png"
-                width="256px"
-                onclick="window.open(this.src, '_blank');"
-                alt="Initial board of canvas {canvas}"
-            />
-            <span>Initial canvas</span>
-        </div>
-        {#if !active}
-            <div class="image-wrapper">
-                <img
-                    bind:this={finalImgEl}
-                    src={isOpen ? `data/images/canvas-${canvas}-final.png` : null}
-                    data-src="data/images/canvas-{canvas}-final.png"
-                    width="256px"
-                    onclick="window.open(this.src, '_blank');"
-                    alt="Final board of canvas {canvas}"
+        {#if isOpen}
+            <div class="media-group">
+                <ImageWrapper
+                    src="data/images/canvas-{canvas.code}-initial.png"
+                    caption="Initial canvas"
+                    alt="Initial board of canvas {canvas.code}"
+                    {loadedImages}
                 />
-                <span>Final canvas</span>
+                {#if !canvas.active}
+                    <ImageWrapper
+                        src="data/images/canvas-{canvas.code}-final.png"
+                        caption="Final canvas"
+                        alt="Final board of canvas {canvas.code}"
+                        {loadedImages}
+                    />
+                {/if}
             </div>
-        {/if}
-        {#if meta}
-            {#if meta.end}
-                <p>Canvas {canvas} started on <strong>{startDateStr}</strong> and ended on <strong>{endDateStr}</strong>. It lasted <strong>{duration} days</strong>.</p>
-            {:else}
-                <p>Canvas {canvas} started on <strong>{startDateStr}</strong>.</p>
-            {/if}
-            {#if meta.description}
-                <br>
-                <p>{@html meta.description}</p>
+            {#if canvas}
+                {#if canvas.end}
+                    <p>Canvas {canvas.code} started on <strong>{startDateStr}</strong> and ended on <strong>{endDateStr}</strong>. It lasted <strong>{duration} days</strong>.</p>
+                {:else}
+                    <p>Canvas {canvas.code} started on <strong>{startDateStr}</strong>.</p>
+                {/if}
+                {#if canvas.description}
+                    <br>
+                    <p>{@html canvas.description}</p>
+                {/if}
+                {#if canvas.hasTimelapses}
+                    <h2>Timelapses</h2>
+                    <div class="media-group">
+                        {#if canvas.timelapses.normal}
+                            <div class="timelapse-container" data-sveltekit-preload-data="off">
+                                <p><strong>Normal</strong>; 1 frame every 5 minutes:</p>
+                                <p><a href="data/videos/{canvas.timelapses.normal.fileName}">{canvas.timelapses.normal.fileName}</a> - {canvas.timelapses.normal.fileSize}</p>
+                                <VideoWrapper
+                                    src="data/videos/{canvas.timelapses.normal.fileName}"
+                                    poster="data/images/canvas-{canvas.code}-final.png"
+                                    fileSize={canvas.timelapses.normal.fileSize}
+                                />
+                            </div>
+                        {/if}
+                        {#if canvas.timelapses.activity}
+                            <div class="timelapse-container" data-sveltekit-preload-data="off">
+                                <p><strong>Activity</strong>; 1 frame every 5 minutes:</p>
+                                <p><a href="data/videos/{canvas.timelapses.activity.fileName}">{canvas.timelapses.activity.fileName}</a> - {canvas.timelapses.activity.fileSize}</p>
+                                <VideoWrapper
+                                    src="data/videos/{canvas.timelapses.activity.fileName}"
+                                    poster="data/images/c{canvas.code}_heat_0.png"
+                                    fileSize={canvas.timelapses.activity.fileSize}
+                                />
+                            </div>
+                        {/if}
+                        {#if canvas.timelapses.virgin}
+                            <div class="timelapse-container" data-sveltekit-preload-data="off">
+                                <p><strong>Virgin</strong>; 1 frame every 5 minutes:</p>
+                                <p><a href="data/videos/{canvas.timelapses.virgin.fileName}">{canvas.timelapses.virgin.fileName}</a> - {canvas.timelapses.virgin.fileSize}</p>
+                                <VideoWrapper
+                                    src="data/videos/{canvas.timelapses.virgin.fileName}"
+                                    poster="data/images/c{canvas.code}_virgin_0.png"
+                                    fileSize={canvas.timelapses.virgin.fileSize}
+                                />
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+                {#if canvas.hasGraphs}
+                    <h2>Graphs</h2>
+                    <div class="media-group">
+                        {#if canvas.graphs.heat}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_heat_0.png"
+                                caption="Heat"
+                                alt="Heat"
+                                {loadedImages}
+                            />
+                        {/if}
+                        {#if canvas.graphs.virgin}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_virgin_0.png"
+                                caption="Virginmap"
+                                alt="Virginmap"
+                                {loadedImages}
+                            />
+                        {/if}
+                    </div>
+                    <div class="media-group">
+                        {#if canvas.graphs.action}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_action_0.png"
+                                caption="Actions"
+                                alt="Actions"
+                                {loadedImages}
+                            />
+                        {/if}
+                        {#if canvas.graphs.age}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_age_0.png"
+                                caption="Age"
+                                alt="Age"
+                                {loadedImages}
+                            />
+                        {/if}
+                        {#if canvas.graphs.combined}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_combined_0.png"
+                                caption="Combined"
+                                alt="Combined"
+                                {loadedImages}
+                            />
+                        {/if}
+                    </div>
+                    <div class="media-group">
+                        {#if canvas.graphs.minutes}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_minutes_0.png"
+                                caption="Minutes"
+                                alt="Minutes"
+                                {loadedImages}
+                            />
+                        {/if}
+                        {#if canvas.graphs.seconds}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_seconds_0.png"
+                                caption="Seconds"
+                                alt="Seconds"
+                                {loadedImages}
+                            />
+                        {/if}
+                        {#if canvas.graphs.milliseconds}
+                            <ImageWrapper
+                                src="data/images/c{canvas.code}_milliseconds_0.png"
+                                caption="Milliseconds"
+                                alt="Milliseconds"
+                                {loadedImages}
+                            />
+                        {/if}
+                    </div>
+                {/if}
             {/if}
         {/if}
     </div>
@@ -118,20 +193,21 @@ details[open] summary {
     padding: 15px;
 }
 
-.canvas-body img {
-    display: block;
-    margin: 16px;
-    margin-bottom: 8px;
-}
-
-.canvas-body .image-wrapper {
+.canvas-body .timelapse-container {
     display: inline-block;
-    border: 2px solid black;
-    padding-bottom: 8px;
-    background: #FFF;
 }
 
-.canvas-body .image-wrapper {
-    text-align: center;
+.canvas-body .timelapse-container:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.media-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.media-group + .media-group {
+    margin-top: 5px;
 }
 </style>

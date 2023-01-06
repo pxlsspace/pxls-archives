@@ -25,7 +25,7 @@
         <p><b>Clicking on an image will open it in a new tab</b></p>
     </div>
     {#each [...data.canvases].reverse() as canvas}
-        <CanvasDetails canvas={canvas.code} meta={canvas} active={canvas.active} />
+        <CanvasDetails canvas={canvas} />
     {/each}
 </div>
 
