@@ -1,7 +1,6 @@
 <script>
     import moment from 'moment';
     import ImageWrapper from './ImageWrapper.svelte';
-    import MediaWrapper from './MediaWrapper.svelte';
     import VideoWrapper from './VideoWrapper.svelte';
 
     /**
@@ -20,7 +19,7 @@
     /**
      * Whether the details is open (expanded).
      */
-    let isOpen = canvas.active// || canvas.code === '63';
+    let isOpen = canvas.active;
 
     let loadedImages = new Map();
 </script>
