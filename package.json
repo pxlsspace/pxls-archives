@@ -1,6 +1,6 @@
 {
 	"name": "pxls-archives",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -20,6 +20,7 @@
 		"moment": "^2.29.4",
 		"probe-image-size": "^7.2.3",
 		"showdown": "^2.1.0",
+		"svelte-bootstrap-icons": "^2.3.1",
 		"yaml": "^2.2.1"
 	}
 }

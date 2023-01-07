@@ -1,9 +1,6 @@
 <script>
-    import CanvasDetails from "../components/CanvasDetails.svelte";
+    import CanvasCard from '../components/CanvasCard.svelte';
 
-    /**
-     * @type {import('./$types').PageData}
-     */
     export let data;
 
     const version = 'v' + data.version;
@@ -21,12 +18,12 @@
             Welcome to the Pxls Archives! This page aims to provide historical data
             for canvases spanning from the very beginning to today.
         </p>
-        <br />
-        <p><b>Clicking on an image will open it in a new tab</b></p>
     </div>
-    {#each [...data.canvases].reverse() as canvas}
-        <CanvasDetails canvas={canvas} />
-    {/each}
+    <div class="canvas-cards">
+        {#each [...data.canvases].reverse() as canvas}
+            <CanvasCard {canvas} />
+        {/each}
+    </div>
 </div>
 
 <style>
@@ -40,5 +37,11 @@
 
 #container {
     margin: 15px;
+}
+
+.canvas-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 </style>

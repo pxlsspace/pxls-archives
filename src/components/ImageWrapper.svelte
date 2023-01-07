@@ -9,7 +9,7 @@
     export let alt;
 
     /** @type {Map} A map of loaded images. */
-    export let loadedImages;
+    export let loadedImages = new Map();
 
     function lazy(node, data) {
         if (loadedImages.has(data.src)) {
