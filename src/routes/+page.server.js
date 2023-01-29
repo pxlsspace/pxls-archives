@@ -6,11 +6,11 @@ import probe from 'probe-image-size';
 const converter = new showdown.Converter();
 
 export async function load() {
-    const metaStr = fs.readFileSync('static/data/meta.yml', 'utf8');
+    const metaStr = fs.readFileSync('data/meta.yml', 'utf8');
     const meta = YAML.parse(metaStr);
 
-    const imageFiles = fs.readdirSync('static/data/images');
-    const videoFiles = fs.readdirSync('static/data/videos');
+    const imageFiles = fs.readdirSync('data/images');
+    const videoFiles = fs.readdirSync('data/videos');
 
     const getFileInfo = (type, name) => {
         let files;
@@ -22,7 +22,7 @@ export async function load() {
 
         const fileName = files.find(fileName => fileName === name);
         if (!fileName) return null;
-        const stats = fs.statSync(`static/data/${type}/${fileName}`);
+        const stats = fs.statSync(`data/${type}/${fileName}`);
         return {
             fileName,
             // In megabytes
@@ -35,7 +35,7 @@ export async function load() {
         if (description) {
             meta.canvases[i].description = converter.makeHtml(description);
         }
-        const { width, height } = await probe(fs.createReadStream(`static/data/images/canvas-${code}-initial.png`));
+        const { width, height } = await probe(fs.createReadStream(`data/images/canvas-${code}-initial.png`));
         meta.canvases[i].width = width;
         meta.canvases[i].height = height;
         meta.canvases[i].timelapses = {
@@ -58,9 +58,7 @@ export async function load() {
     }
 
     return {
-        version: process.env.npm_package_version,
+        version: (await import('../../package')).version,
         ...meta
     };
 }
-
-export const prerender = true;

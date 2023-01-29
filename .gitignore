@@ -10,7 +10,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /.vscode
 
-static/data
+data
 
 scripts/venv
 scripts/data

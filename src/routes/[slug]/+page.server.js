@@ -16,7 +16,7 @@ export async function load({ params }) {
 
     const reqCanvasCode = exec[1];
 
-    const metaStr = fs.readFileSync('static/data/meta.yml', 'utf8');
+    const metaStr = fs.readFileSync('data/meta.yml', 'utf8');
     const meta = YAML.parse(metaStr);
 
     const canvas = meta.canvases.find(canvas => canvas.code === reqCanvasCode);
@@ -25,8 +25,8 @@ export async function load({ params }) {
         throw error(404, 'Canvas not found');
     }
 
-    const imageFiles = fs.readdirSync('static/data/images');
-    const videoFiles = fs.readdirSync('static/data/videos');
+    const imageFiles = fs.readdirSync('data/images');
+    const videoFiles = fs.readdirSync('data/videos');
 
     const getFileInfo = (type, name) => {
         let files;
@@ -38,7 +38,7 @@ export async function load({ params }) {
 
         const fileName = files.find(fileName => fileName === name);
         if (!fileName) return null;
-        const stats = fs.statSync(`static/data/${type}/${fileName}`);
+        const stats = fs.statSync(`data/${type}/${fileName}`);
         return {
             fileName,
             // In megabytes
@@ -50,7 +50,7 @@ export async function load({ params }) {
     if (description) {
         canvas.description = converter.makeHtml(description);
     }
-    const { width, height } = await probe(fs.createReadStream(`static/data/images/canvas-${code}-initial.png`));
+    const { width, height } = await probe(fs.createReadStream(`data/images/canvas-${code}-initial.png`));
     canvas.width = width;
     canvas.height = height;
     canvas.timelapses = {
@@ -73,5 +73,3 @@ export async function load({ params }) {
 
     return { canvas };
 }
-
-export const prerender = true;

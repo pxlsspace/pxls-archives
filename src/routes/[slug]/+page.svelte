@@ -9,7 +9,7 @@
 
     /**
      * Metadata about the canvas.
-     * See static/data/meta.yml for more.
+     * See data/meta.yml for more.
      * @type {object}
      */
     let { canvas } = data;
